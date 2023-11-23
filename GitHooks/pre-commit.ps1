@@ -45,12 +45,15 @@ Import-Module "$PSScriptRoot\..\HelpModule\findProjectToBump.psm1" -Force
       $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
 
       if($ReleaseNotesConfig.VersionBump -eq 0 -and $codeUpdated){
+        Write-Host "There are Code Update in this projec"
         $ReleaseNotesConfig.VersionBump = 1
         $ReleaseNotesConfig.ReleaseText = "- Don't know what have changes"
       } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $projecFilsUpdated){
+        Write-Host "There are projec Fils Updated in this projec"
         $ReleaseNotesConfig.VersionBump = 3
         $ReleaseNotesConfig.ReleaseText = "- Dependencies updated."
       } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $detectedBuildFilesEdited ){
+        Write-Host "There are detected Build Files Edited in this projec"
         $ReleaseNotesConfig.VersionBump = 3
         $ReleaseNotesConfig.ReleaseText = "- No functional changes."
       }
@@ -91,7 +94,7 @@ Import-Module "$PSScriptRoot\..\HelpModule\findProjectToBump.psm1" -Force
         $pagetesId = (Get-Content -Path $file -TotalCount 1)
 
         $pattern = "<PackageId>" + ([regex]::Match($pagetesId, "Energinet.*?(?= )")) + "</PackageId>"
-        Write-Host ("Project File Patton: " + $pattern) -ForegroundColor Cyan
+        Write-Host ("Project File Pattern: " + $pattern) -ForegroundColor Cyan
         $projecFile = Get-ChildItem -Path ".\" -Recurse -Include *.csproj | Select-String -Pattern "$pattern" | Select-Object Path
         Write-Host ("Project File: " + $projecFile.Path) -ForegroundColor Cyan
         [regex]::Replace((Get-Content $projecFile.Path -Raw),'(?<=<PackageVersion>).*?(?=<\/PackageVersion>)', $replacement) | Set-Content $projecFile.Path -NoNewline -Encoding Ascii

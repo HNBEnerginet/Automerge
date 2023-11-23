@@ -58,7 +58,7 @@ function DetectUpdatedProjectFiles
     )
 
     $file_content = Get-Content -Path $readmefilePath -Raw
-    pattern = re.compile(r'Pattern:(\S+)')
+    $pattern = 'Energinet.DDP.(\S+)'
 
     $projectNameSpace =""
 
