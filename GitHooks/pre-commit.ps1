@@ -7,6 +7,8 @@
   PS> .\Build\Templates\Scripts\Setup\setupGitHooks.ps1
 
   #>
+Import-Module "$PSScriptRoot\..\HelpModule\findProjectToBump.psm1" -Force
+
   if(git rev-parse --abbrev-ref HEAD -ne "master")
   {
     Write-Host "Hook called" -ForegroundColor Cyan
@@ -21,6 +23,12 @@
       git add $file
     }
 
+    $filesUpdated = filsUpdated
+    $detectedBuildFilesEdited = DetectBuildFiles -$filesUpdated
+
+
+    Write-Host "files edited: $detectedBuildFilesEdited"
+
     foreach ($file in $files)
     {
       if(-not (Test-Path -Path "$file.json"))
@@ -28,12 +36,29 @@
         continue
       }
 
+      $projecFilsUpdated = DetectUpdatedProjectConfigFiles -readmefilePath $file -editedFiles $filesUpdated
+      $codeUpdated = DetectUpdatedProjectFiles -readmefilePath $file -editedFiles $filesUpdated
+      Write-Host "files edited: $test"
+
       Write-Host "File: $file" -ForegroundColor Cyan
 
       $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
 
+      if($ReleaseNotesConfig.VersionBump -eq 0 -and $codeUpdated){
+        $ReleaseNotesConfig.VersionBump = 1
+        $ReleaseNotesConfig.ReleaseText = "- Don't know what have changes"
+      } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $projecFilsUpdated){
+        $ReleaseNotesConfig.VersionBump = 3
+        $ReleaseNotesConfig.ReleaseText = "- Dependencies updated."
+      } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $detectedBuildFilesEdited ){
+        $ReleaseNotesConfig.VersionBump = 3
+        $ReleaseNotesConfig.ReleaseText = "- No functional changes."
+      }
+
       if($ReleaseNotesConfig.VersionBump -ne 0)
       {
+        $isBuildFilesEdited = DetectBuildFiles -$filesUpdated
+        write-Host "is edited: $isBuildFilesEdited"
         Write-Host ("Version To bump: " + $ReleaseNotesConfig.VersionBump) -ForegroundColor Cyan
 
         $ReleaseNotes = Get-Content $file -Raw
