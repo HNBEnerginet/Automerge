@@ -32,7 +32,8 @@
 
   $gitHooks = Get-ChildItem -Path $refGitHooksFolder -File -Name
 
-  foreach($gitHook in $gitHooks) {
+  foreach($gitHook in $gitHooks) 
+  {
 
     $gitHookPostMergeFileUri = $gitHookUri +  ($gitHook -replace ".ps1", "")
     Write-Output "Creating git hook post-merge file $gitHookPostMergeFileUri" -ForegroundColor Cyan

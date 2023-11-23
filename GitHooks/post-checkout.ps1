@@ -13,13 +13,17 @@ $files = Get-ChildItem -Path "*\ReleaseNotes\*ReleaseNotes.md" -Recurse | Select
 
 foreach ($file in $files)
 {
-    if (Test-Path -Path "$file.json" || )
+    if (Test-Path -Path "$file.json")
     {
-        continue
+        $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
+        if($ReleaseNotesConfig.BranchName -ne $branchName)
+        {
+          continue
+        }
     }
 
     $content = @{
-        Branch = $branchName
+        BranchName = $branchName
         VersionBump = 0
         ReleaseText = ""
     }
