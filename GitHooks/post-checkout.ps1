@@ -9,7 +9,7 @@
   #>
 
 $branchName = git rev-parse --abbrev-ref HEAD
-$files = Get-ChildItem -Path "*\ReleaseNotes\*ReleaseNotes.md" -Recurse | Select-Object -ExpandProperty FullName
+$files = Get-ChildItem -Path "*ReleaseNotes.md" -Recurse | Select-Object -ExpandProperty FullName
 
 foreach ($file in $files)
 {
