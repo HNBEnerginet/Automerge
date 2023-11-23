@@ -48,6 +48,6 @@
   $attributesContent = @'
 **/ReleaseNotes/ReleaseNotes.md merge=ours
 **/ReleaseNotes/ReleaseNotes.config.json merge=ours
-**/packages.lock.json merge=ours
+**/ReleaseNotes.json merge=ours
 '@
   Set-Content $gitAddributFile $attributesContent -Force

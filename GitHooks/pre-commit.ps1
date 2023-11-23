@@ -25,11 +25,11 @@
     
     foreach ($file in $files)
     {
-      if(Test-Path -Path "$file\local.settings.json")
+      if(Test-Path -Path "$file\ReleaseNotes.json")
       {
         Write-Host "File: $file" -ForegroundColor Cyan
 
-        $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file\local.settings.json" -Raw)
+        $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file\ReleaseNotes.json" -Raw)
 
         
         if($ReleaseNotesConfig.VersionBump -ne 0)

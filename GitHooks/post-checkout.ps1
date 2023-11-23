@@ -19,6 +19,6 @@ if(-not (git for-each-ref --format="%(upstream:short)" refs/heads/$branchName))
         VersionBump = 0
         ReleaseText = ""
       }
-      Set-Content "$file\local.settings.json" (ConvertTo-Json $content) -Force -NoNewline -Encoding Ascii
+      Set-Content "$file\ReleaseNotes.json" (ConvertTo-Json $content) -Force -NoNewline -Encoding Ascii
     }
 }
