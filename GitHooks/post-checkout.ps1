@@ -15,9 +15,11 @@ foreach ($file in $files)
 {
     if (Test-Path -Path "$file.json")
     {
+        write-host "could find file $file"
         $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
-        if($ReleaseNotesConfig.BranchName -ne $branchName)
+        if($ReleaseNotesConfig.BranchName -eq $branchName)
         {
+            write-host "skip file because of branch $branchName"
           continue
         }
     }

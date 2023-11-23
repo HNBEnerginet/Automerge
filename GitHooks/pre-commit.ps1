@@ -27,7 +27,7 @@
       {
         continue
       }
-      
+
       Write-Host "File: $file" -ForegroundColor Cyan
 
       $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
