@@ -10,10 +10,11 @@
     $mypath = $MyInvocation.MyCommand.Path
     Write-Output "Path of the script : $mypath"
     $path = Split-Path $mypath -Parent
+    $path = $path -replace "\\", "/"
     Write-Output "Path of the Parent : $path"
     $gitHookUri = ".git\hooks\"
     $gitAddributFile = ".git\info\attributes"
-    $refGitHooksFolder = "$path\..\GitHooks"
+    $refGitHooksFolder = "$path/../GitHooks"
 
   if (-not (Test-Path $gitHookUri))
   {
@@ -26,7 +27,7 @@
       Write-Output "Git hook PS folder not found" -ForegroundColor Cyan
       return
   }
-  
+
   Write-Output "Start Creation of git hook post-merge file" -ForegroundColor Cyan
 
   $gitHooks = Get-ChildItem -Path $refGitHooksFolder -File -Name

@@ -9,16 +9,19 @@
   #>
 
 $branchName = git rev-parse --abbrev-ref HEAD
+$files = Get-ChildItem -Path "*\ReleaseNotes\*ReleaseNotes.md" -Recurse | Select-Object -ExpandProperty FullName
 
-if(-not (git for-each-ref --format="%(upstream:short)" refs/heads/$branchName))
+foreach ($file in $files)
 {
-    $files = Get-ChildItem -Path "*\ReleaseNotes.md" -Recurse | Select-Object -ExpandProperty FullName | Split-Path -Parent
-    foreach ($file in $files)
+    if (Test-Path -Path "$file.json" || )
     {
-      $content = @{
+        continue
+    }
+
+    $content = @{
+        Branch = $branchName
         VersionBump = 0
         ReleaseText = ""
-      }
-      Set-Content "$file\ReleaseNotes.json" (ConvertTo-Json $content) -Force -NoNewline -Encoding Ascii
     }
+    Set-Content "$file.json" (ConvertTo-Json $content) -Force -NoNewline -Encoding Ascii
 }

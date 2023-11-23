@@ -9,33 +9,31 @@
   #>
   if(git rev-parse --abbrev-ref HEAD -ne "master")
   {
-    Write-Host "Hook calt" -ForegroundColor Cyan
+    Write-Host "Hook called" -ForegroundColor Cyan
 
-    $filesName = @("*\ReleaseNotes.md")
-    $mergeconfligts = Get-ChildItem -Path $filesName -Recurse
+    $filesName = @("*\*ReleaseNotes.md")
+    $files = Get-ChildItem -Path $filesName -Recurse | Select-Object -ExpandProperty FullName
 
-    foreach ($file in $mergeconfligts)
+    foreach ($file in $files)
     {
       Write-Host "files to tjek: $file" -ForegroundColor Cyan
       git checkout origin/master $file
       git add $file
     }
-    
-    $files = Get-ChildItem -Path "*\ReleaseNotes.md" -Recurse | Select-Object -ExpandProperty FullName | Split-Path -Parent
-    
+
     foreach ($file in $files)
     {
-      if(Test-Path -Path "$file\ReleaseNotes.json")
+      if(Test-Path -Path "$file.json")
       {
         Write-Host "File: $file" -ForegroundColor Cyan
 
-        $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file\ReleaseNotes.json" -Raw)
+        $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
 
-        
         if($ReleaseNotesConfig.VersionBump -ne 0)
         {
           Write-Host ("Version To bump: " + $ReleaseNotesConfig.VersionBump) -ForegroundColor Cyan
-          $ReleaseNotes = Get-Content "$file\ReleaseNotes.md" -Raw
+
+          $ReleaseNotes = Get-Content $file -Raw
           $match = [Regex]::Match($ReleaseNotes, '## Version (?<Major>[\d]+)\.(?<Minor>[\d]+)\.(?<Patch>[\d]+)')
           $Major = [int]::Parse($match.Groups["Major"].Value)
           $Minor = [int]::Parse($match.Groups["Minor"].Value)
@@ -56,13 +54,13 @@
           #ReleaseNotes Opdate
           $newText = "## Version $Major.$Minor.$Patch`n" + $ReleaseNotesConfig.ReleaseText + "`n`n* * *`n" + $match.Value
           $ReleaseNotes = $ReleaseNotes -replace $match.Value, $newText
-          Set-Content "$file\ReleaseNotes.md" $ReleaseNotes -Force -NoNewline -Encoding Ascii
-          git add "$file\ReleaseNotes.md"
-          
+          Set-Content $file $ReleaseNotes -Force -NoNewline -Encoding Ascii
+          git add $file
+
           #csproj Opdate
           $replacement = "$Major.$Minor.$Patch" + '$(VersionSuffix)'
 
-          $pagetesId = (Get-Content -Path "$file\ReleaseNotes.md" -TotalCount 1)
+          $pagetesId = (Get-Content -Path $file -TotalCount 1)
 
           $pattern = "<PackageId>" + ([regex]::Match($pagetesId, "Energinet.*?(?= )")) + "</PackageId>"
           Write-Host ("Project File Patton: " + $pattern) -ForegroundColor Cyan
