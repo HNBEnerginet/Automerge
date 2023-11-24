@@ -118,12 +118,13 @@ function DetectUpdatedProjectConfigFiles
     return $false;
 }
 
-function UpdaetJsonReleaseNotesConfig
+function UpdateJsonReleaseNotesConfig
 {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
         [string]$branchName,
+        [Parameter(Mandatory = $true)]
         [string[]]$ReleaseNotesFiles
     )
 
@@ -147,6 +148,10 @@ function UpdaetJsonReleaseNotesConfig
             BreakingText = @("")
         }
         Set-Content "$file.json" (ConvertTo-Json $content) -Force -NoNewline -Encoding Ascii
+
+        git add "$file.json"
     }
+
+
 
 }

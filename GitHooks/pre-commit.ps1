@@ -25,7 +25,7 @@ Write-Host "Hook called" -ForegroundColor Cyan
 
 $files = Get-ChildItem -Path "*ReleaseNotes.md" -Recurse | Select-Object -ExpandProperty FullName
 
-UpdaetJsonReleaseNotesConfig -ReleaseNotesFiles $files -branchName $branchName
+UpdateJsonReleaseNotesConfig -ReleaseNotesFiles $files -branchName $branchName
 
 foreach ($file in $files)
 {
@@ -97,7 +97,7 @@ foreach ($file in $files)
     $Patch = 0
     $releaseText += "`n"
     $releaseText = $releaseText.Replace("- `n`n","")
-    $releaseText += '<span style="background-color: #ffdacc; color: black;">**Breaking changes:**</span>' + "`n" 
+    $releaseText += '<span style="background-color: #ffdacc; color: black;">**Breaking changes:**</span>' + "`n"
     foreach ($text in $ReleaseNotesConfig.BreakingText)
     {
       $releaseText += "- $text`n"
