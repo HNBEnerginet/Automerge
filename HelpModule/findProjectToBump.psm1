@@ -17,7 +17,7 @@ function DetectBuildFiles {
     if ($editedFiles.Count -eq 0)
     {
         Write-Host "No edited files in solution for branch"
-        return
+        return $false
     }
     Write-Host "Edited files:"
     Write-Host "Check project 'Build' for changes"
@@ -38,13 +38,13 @@ function DetectBuildFiles {
             'Source/Libraries.sln' { break; }
             'Build/*' {
                 Write-Host "File '$editedFile' have changed so we need to publish all packages"
-                return $true;
+                return $true
             }
         }
     }
 
     Write-Host "No build files edited"
-    return $false;
+    return $false
 }
 
 function DetectUpdatedProjectFiles
@@ -64,6 +64,7 @@ function DetectUpdatedProjectFiles
 
     if ($file_content -match $pattern) {
         $projectNameSpace = $matches[1]
+        Write-Host "Start Evaluating: $projectNameSpace" -ForegroundColor Cyan
     }else{
         write-host "Could not find related project"
         return $false
@@ -73,7 +74,7 @@ function DetectUpdatedProjectFiles
     {
         Switch -Wildcard ($editedFile) {
             "*/packages.lock.json" { break; }
-            "*/*.csproj" { break; }
+            "*.csproj" { break; }
             "*/$projectNameSpace/*" {
                return $true
             }
@@ -98,8 +99,8 @@ function DetectUpdatedProjectConfigFiles
     $projectNameSpace =""
 
     if ($file_content -match $pattern) {
-        $projectNameSpace = $matches[0]
-        Write-Host "Project name space: $projectNameSpace"
+        $projectNameSpace = $matches[1]
+        Write-Host "Project name space: $projectNameSpace test"
     }else{
         write-host "Could not find related project"
         return $false
@@ -107,13 +108,44 @@ function DetectUpdatedProjectConfigFiles
 
     foreach ($editedFile in $editedFiles)
     {
-        Switch -Wildcard ($editedFile) {
-            "*/Source/$projectNameSpace/packages.lock.json" {
-                return $true
-            }
+        if ($editedFile.EndsWith("/Source/$projectNameSpace/packages.lock.json"))
+        {
+            return $true
         }
     }
 
     Write-Host "No project files where updated"
     return $false;
+}
+
+function UpdaetJsonReleaseNotesConfig
+{
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string]$branchName,
+        [string[]]$ReleaseNotesFiles
+    )
+
+    foreach ($file in $ReleaseNotesFiles)
+    {
+        if (Test-Path -Path "$file.json")
+        {
+            write-host "could find file $file"
+            $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
+            if($ReleaseNotesConfig.BranchName -eq $branchName)
+            {
+                write-host "skip file because of branch $branchName"
+            continue
+            }
+        }
+
+        $content = @{
+            BranchName = $branchName
+            VersionBump = 0
+            ReleaseText = ""
+        }
+        Set-Content "$file.json" (ConvertTo-Json $content) -Force -NoNewline -Encoding Ascii
+    }
+
 }
