@@ -53,18 +53,24 @@ foreach ($file in $files)
 
   $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
 
-  if($ReleaseNotesConfig.VersionBump -eq 0 -and $codeUpdated){
+  if($ReleaseNotesConfig.VersionBump -eq 0 -and $codeUpdated)
+  {
     Write-Host "There are Code Update in this projec" -ForegroundColor Cyan
     continue
-  } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $projecFilsUpdated){
+  }
+
+  if ($ReleaseNotesConfig.VersionBump -eq 0 -and $projecFilsUpdated)
+  {
     Write-Host "There are projec Fils Updated in this projec" -ForegroundColor Cyan
     $ReleaseNotesConfig.VersionBump = 3
     $ReleaseNotesConfig.ReleaseText = "- Dependencies updated."
-  } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $detectedBuildFilesEdited ){
+  } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $detectedBuildFilesEdited )
+  {
     Write-Host "There are detected Build Files Edited in this projec" -ForegroundColor Cyan
     $ReleaseNotesConfig.VersionBump = 3
     $ReleaseNotesConfig.ReleaseText = "- No functional changes."
-  } elseif ($ReleaseNotesConfig.VersionBump -eq 0) {
+  } elseif ($ReleaseNotesConfig.VersionBump -eq 0)
+  {
     Write-Host "No update for the prject" -ForegroundColor Cyan
     continue
   }
