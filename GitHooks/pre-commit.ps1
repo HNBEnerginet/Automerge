@@ -96,13 +96,21 @@ foreach ($file in $files)
     $Patch++
   }
 
-  #ReleaseNotes Opdate
-  $newText = "## Version $Major.$Minor.$Patch`n" + $ReleaseNotesConfig.ReleaseText + "`n`n* * *`n" + $match.Value
+  #ReleaseNotes update
+  $releaseText = ""
+
+  foreach ($text in $ReleaseNotesConfig.ReleaseText)
+  {
+    $releaseText = "- $text`n"
+  }
+
+  $newText = "## Version $Major.$Minor.$Patch`n" + $releaseText + "`n`n* * *`n" + $match.Value
   $ReleaseNotes = $ReleaseNotes -replace $match.Value, $newText
+
   Set-Content $file $ReleaseNotes -Force -NoNewline -Encoding Ascii
   git add $file
 
-  #csproj Opdate
+  #csproj update
   $replacement = "$Major.$Minor.$Patch" + '$(VersionSuffix)'
 
   $pagetesId = (Get-Content -Path $file -TotalCount 1)

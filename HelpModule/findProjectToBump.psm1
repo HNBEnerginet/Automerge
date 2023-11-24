@@ -143,7 +143,8 @@ function UpdaetJsonReleaseNotesConfig
         $content = @{
             BranchName = $branchName
             VersionBump = 0
-            ReleaseText = ""
+            ReleaseText = []
+            BreakingText = []
         }
         Set-Content "$file.json" (ConvertTo-Json $content) -Force -NoNewline -Encoding Ascii
     }

@@ -32,7 +32,7 @@
 
   $gitHooks = Get-ChildItem -Path $refGitHooksFolder -File -Name
 
-  foreach($gitHook in $gitHooks) 
+  foreach($gitHook in $gitHooks)
   {
 
     $gitHookPostMergeFileUri = $gitHookUri +  ($gitHook -replace ".ps1", "")
