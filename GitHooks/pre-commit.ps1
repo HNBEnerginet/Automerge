@@ -40,20 +40,20 @@ Import-Module "$PSScriptRoot\..\HelpModule\findProjectToBump.psm1" -Force
       $codeUpdated = DetectUpdatedProjectFiles -readmefilePath $file -editedFiles $filesUpdated
       Write-Host "files edited: $test"
 
-      Write-Host "File: $file" -ForegroundColor Cyan
+      Write-Host "file: $file" -ForegroundColor Cyan
 
       $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
 
       if($ReleaseNotesConfig.VersionBump -eq 0 -and $codeUpdated){
-        Write-Host "There are Code Update in this projec"
+        Write-Host "There are Code Update in this project"
         $ReleaseNotesConfig.VersionBump = 1
         $ReleaseNotesConfig.ReleaseText = "- Don't know what have changes"
       } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $projecFilsUpdated){
-        Write-Host "There are projec Fils Updated in this projec"
+        Write-Host "There are project fils updated in this project"
         $ReleaseNotesConfig.VersionBump = 3
         $ReleaseNotesConfig.ReleaseText = "- Dependencies updated."
       } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $detectedBuildFilesEdited ){
-        Write-Host "There are detected Build Files Edited in this projec"
+        Write-Host "There are detected Build Files Edited in this project"
         $ReleaseNotesConfig.VersionBump = 3
         $ReleaseNotesConfig.ReleaseText = "- No functional changes."
       }
@@ -82,13 +82,13 @@ Import-Module "$PSScriptRoot\..\HelpModule\findProjectToBump.psm1" -Force
           $Patch++
         }
 
-        #ReleaseNotes Opdate
+        #ReleaseNotes update
         $newText = "## Version $Major.$Minor.$Patch`n" + $ReleaseNotesConfig.ReleaseText + "`n`n* * *`n" + $match.Value
         $ReleaseNotes = $ReleaseNotes -replace $match.Value, $newText
         Set-Content $file $ReleaseNotes -Force -NoNewline -Encoding Ascii
         git add $file
 
-        #csproj Opdate
+        #csproj update
         $replacement = "$Major.$Minor.$Patch" + '$(VersionSuffix)'
 
         $pagetesId = (Get-Content -Path $file -TotalCount 1)
