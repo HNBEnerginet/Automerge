@@ -29,7 +29,7 @@ UpdaetJsonReleaseNotesConfig -ReleaseNotesFiles $files -branchName $branchName
 
 foreach ($file in $files)
 {
-  Write-Host "files to tjek: $file" -ForegroundColor Cyan
+  Write-Host "check files: $file" -ForegroundColor Cyan
   git checkout origin/master $file
   git add $file
 }
@@ -54,18 +54,18 @@ foreach ($file in $files)
   $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
 
   if($ReleaseNotesConfig.VersionBump -eq 0 -and $codeUpdated){
-    Write-Host "There are Code Update in this projec" -ForegroundColor Cyan
+    Write-Host "Code Updated in this project" -ForegroundColor Cyan
     continue
   } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $projecFilsUpdated){
-    Write-Host "There are projec Fils Updated in this projec" -ForegroundColor Cyan
+    Write-Host "Project Files Updated in this project" -ForegroundColor Cyan
     $ReleaseNotesConfig.VersionBump = 3
     $ReleaseNotesConfig.ReleaseText = "- Dependencies updated."
   } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $detectedBuildFilesEdited ){
-    Write-Host "There are detected Build Files Edited in this projec" -ForegroundColor Cyan
+    Write-Host "Detected Build Files Edited in this project" -ForegroundColor Cyan
     $ReleaseNotesConfig.VersionBump = 3
     $ReleaseNotesConfig.ReleaseText = "- No functional changes."
   } elseif ($ReleaseNotesConfig.VersionBump -eq 0) {
-    Write-Host "No update for the prject" -ForegroundColor Cyan
+    Write-Host "No update for the project" -ForegroundColor Cyan
     continue
   }
 
