@@ -48,8 +48,8 @@
   git config merge.ours.driver true
 
   $attributesContent = @'
-**/ReleaseNotes/ReleaseNotes.md merge=ours
-**/ReleaseNotes/ReleaseNotes.config.json merge=ours
-**/ReleaseNotes.json merge=ours
+**/ReleaseNotes/*ReleaseNotes.md merge=ours
+**/ReleaseNotes/*ReleaseNotes.md.json merge=ours
+**/packages.lock.json merge=ours
 '@
   Set-Content $gitAddributFile $attributesContent -Force
