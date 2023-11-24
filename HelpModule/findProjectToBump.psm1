@@ -108,7 +108,7 @@ function DetectUpdatedProjectConfigFiles
 
     foreach ($editedFile in $editedFiles)
     {
-        if ($editedFile.EndsWith("/Source/$projectNameSpace/packages.lock.json"))
+        if ($editedFile.EndsWith("Source/$projectNameSpace/packages.lock.json"))
         {
             return $true
         }
