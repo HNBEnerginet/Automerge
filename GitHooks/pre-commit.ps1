@@ -62,12 +62,12 @@ foreach ($file in $files)
   {
     Write-Host "Project Files Updated in this project" -ForegroundColor Cyan
     $ReleaseNotesConfig.VersionBump = 3
-    $ReleaseNotesConfig.ReleaseText = "- Dependencies updated."
+    $ReleaseNotesConfig.ReleaseText = @("Dependencies updated.")
   } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $detectedBuildFilesEdited )
   {
     Write-Host "Detected Build Files Edited in this project" -ForegroundColor Cyan
     $ReleaseNotesConfig.VersionBump = 3
-    $ReleaseNotesConfig.ReleaseText = "- No functional changes."
+    $ReleaseNotesConfig.ReleaseText = @("No functional changes.")
   } elseif ($ReleaseNotesConfig.VersionBump -eq 0)
   {
     Write-Host "No update for the project" -ForegroundColor Cyan
@@ -95,6 +95,13 @@ foreach ($file in $files)
     $Major++
     $Minor = 0
     $Patch = 0
+    $releaseText += "`n"
+    $releaseText = $releaseText.Replace("- `n`n","")
+    $releaseText += '<span style="background-color: #ffdacc; color: black;">**Breaking changes:**</span>' + "`n" 
+    foreach ($text in $ReleaseNotesConfig.BreakingText)
+    {
+      $releaseText += "- $text`n"
+    }
   }
   elseif($ReleaseNotesConfig.VersionBump -eq 2){
     $Minor++
@@ -102,14 +109,9 @@ foreach ($file in $files)
   }
   elseif($ReleaseNotesConfig.VersionBump -eq 3){
     $Patch++
-    $releaseText += "`n" + '<span style="background-color: #ffdacc; color: black;">**Breaking changes:**</span>' + "`n" 
-    foreach ($text in $ReleaseNotesConfig.Breaking)
-    {
-      $releaseText += "- $text`n"
-    }
   }
 
-  $newText = "## Version $Major.$Minor.$Patch`n" + $releaseText + "`n`n* * *`n" + $match.Value
+  $newText = "## Version $Major.$Minor.$Patch`n" + $releaseText + "`n* * *`n" + $match.Value
   $ReleaseNotes = $ReleaseNotes -replace $match.Value, $newText
 
   Set-Content $file $ReleaseNotes -Force -NoNewline -Encoding Ascii
