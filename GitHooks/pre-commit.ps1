@@ -83,6 +83,14 @@ foreach ($file in $files)
   $Major = [int]::Parse($match.Groups["Major"].Value)
   $Minor = [int]::Parse($match.Groups["Minor"].Value)
   $Patch = [int]::Parse($match.Groups["Patch"].Value)
+
+  #ReleaseNotes update
+  $releaseText = ""
+  foreach ($text in $ReleaseNotesConfig.ReleaseText)
+  {
+    $releaseText += "- $text`n"
+  }
+
   if($ReleaseNotesConfig.VersionBump -eq 1){
     $Major++
     $Minor = 0
@@ -94,14 +102,11 @@ foreach ($file in $files)
   }
   elseif($ReleaseNotesConfig.VersionBump -eq 3){
     $Patch++
-  }
-
-  #ReleaseNotes update
-  $releaseText = ""
-
-  foreach ($text in $ReleaseNotesConfig.ReleaseText)
-  {
-    $releaseText = "- $text`n"
+    $releaseText += "`n" + '<span style="background-color: #ffdacc; color: black;">**Breaking changes:**</span>' + "`n" 
+    foreach ($text in $ReleaseNotesConfig.Breaking)
+    {
+      $releaseText += "- $text`n"
+    }
   }
 
   $newText = "## Version $Major.$Minor.$Patch`n" + $releaseText + "`n`n* * *`n" + $match.Value
