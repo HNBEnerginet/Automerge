@@ -100,7 +100,6 @@ function DetectUpdatedProjectConfigFiles
 
     if ($file_content -match $pattern) {
         $projectNameSpace = $matches[1]
-        Write-Host "Project name space: $projectNameSpace test"
     }else{
         write-host "Could not find related project"
         return $false

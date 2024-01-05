@@ -8,10 +8,11 @@
 
   #>
 Import-Module "$PSScriptRoot\..\HelpModule\findProjectToBump.psm1" -Force
+Import-Module "$PSScriptRoot\..\HelpModule\dialogChooseVersion.ps1" -Force
 
 $branchName = git rev-parse --abbrev-ref HEAD
 
-if($branchName -eq "master") # brek if is master
+if($branchName -eq "master") # break if is master
 {
   Write-Host "We are on master" -ForegroundColor Cyan
   return
@@ -46,19 +47,31 @@ foreach ($file in $files)
     continue
   }
 
-  $projecFilsUpdated = DetectUpdatedProjectConfigFiles -readmefilePath $file -editedFiles $filesUpdated
+  $projectFilsUpdated = DetectUpdatedProjectConfigFiles -readmefilePath $file -editedFiles $filesUpdated
   $codeUpdated = DetectUpdatedProjectFiles -readmefilePath $file -editedFiles $filesUpdated
 
   Write-Host "File: $file" -ForegroundColor Cyan
 
+
   $ReleaseNotesConfig = ConvertFrom-Json -InputObject (Get-Content "$file.json" -Raw)
+
+  $dialogChosenValue = ""
+  write-host "Is one true: $codeUpdated -or $detectedBuildFilesEdited -or $projectFilsUpdated"
+  if($true){
+    Write-Host "Start dialog box"
+    if( $ReleaseNotesConfig.VersionBump -match '\d'){
+      $dialogChosenValue = DialogChooseVersion -buildVersion $ReleaseNotesConfig.VersionBump -currentBuildVersion "1.0.1"
+    }
+    $dialogChosenValue = DialogChooseVersion
+  }
+
   if($ReleaseNotesConfig.VersionBump -eq 0 -and $codeUpdated)
   {
     Write-Host "Code Updated in this project" -ForegroundColor Cyan
     continue
   }
 
-  if ($ReleaseNotesConfig.VersionBump -eq 0 -and $projecFilsUpdated)
+  if ($ReleaseNotesConfig.VersionBump -eq 0 -or $dialogChosenValue -eq 3 -and $projectFilsUpdated)
   {
     Write-Host "Project Files Updated in this project" -ForegroundColor Cyan
     $ReleaseNotesConfig.VersionBump = 3
@@ -68,7 +81,7 @@ foreach ($file in $files)
     Write-Host "Detected Build Files Edited in this project" -ForegroundColor Cyan
     $ReleaseNotesConfig.VersionBump = 3
     $ReleaseNotesConfig.ReleaseText = @("No functional changes.")
-  } elseif ($ReleaseNotesConfig.VersionBump -eq 0)
+  } elseif ($ReleaseNotesConfig.VersionBump -eq 0 -and $dialogChosenValue -ne "")
   {
     Write-Host "No update for the project" -ForegroundColor Cyan
     continue
@@ -91,7 +104,7 @@ foreach ($file in $files)
     $releaseText += "- $text`n"
   }
 
-  if($ReleaseNotesConfig.VersionBump -eq 1){
+  if($ReleaseNotesConfig.VersionBump -eq 1 -or $dialogChosenValue -eq 1){
     $Major++
     $Minor = 0
     $Patch = 0
@@ -103,11 +116,11 @@ foreach ($file in $files)
       $releaseText += "- $text`n"
     }
   }
-  elseif($ReleaseNotesConfig.VersionBump -eq 2){
+  elseif($ReleaseNotesConfig.VersionBump -eq 2 -or $dialogChosenValue -eq 2){
     $Minor++
     $Patch = 0
   }
-  elseif($ReleaseNotesConfig.VersionBump -eq 3){
+  elseif($ReleaseNotesConfig.VersionBump -eq 3 -or $dialogChosenValue -eq 3){
     $Patch++
   }
 
